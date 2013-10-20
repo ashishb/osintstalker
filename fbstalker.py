@@ -33,8 +33,7 @@ requests.adapters.DEFAULT_RETRIES = 10
 
 h = httplib2.Http(".cache")
 
-access_token=""
-app_access_token=""
+facebook_access_token=""
 facebook_username = ""
 facebook_password = ""
 
@@ -272,7 +271,7 @@ def normalize(s):
 def findUser(findName):
 	stmt = "SELECT uid,current_location,username,name FROM user WHERE contains('"+findName+"')"
 	stmt = stmt.replace(" ","+")
-	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+access_token
+	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+facebook_access_token
 	resp, content = h.request(url, "GET")
 	results = json.loads(content)
 	count=1
@@ -283,7 +282,7 @@ def findUser(findName):
 def convertUser2ID(username):
 	stmt = "SELECT uid,current_location,username,name FROM user WHERE username=('"+username+"')"
 	stmt = stmt.replace(" ","+")
-	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+access_token
+	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+facebook_access_token
 	resp, content = h.request(url, "GET")
 	if resp.status==200:
 		results = json.loads(content)
@@ -297,7 +296,7 @@ def convertUser2ID(username):
 def convertID2User(uid):
 	stmt = "SELECT uid,current_location,username,name FROM user WHERE uid=('"+uid+"')"
 	stmt = stmt.replace(" ","+")
-	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+access_token
+	url="https://graph.facebook.com/fql?q="+stmt+"&access_token="+facebook_access_token
 	resp, content = h.request(url, "GET")
 	results = json.loads(content)
 	return results['data'][0]['uid']
@@ -1998,5 +1997,8 @@ if __name__ == '__main__':
 		conn.close()
 		sys.exit()
  	else:
+		if len(facebook_access_token)<1 or len(facebook_username)<1 or len(facebook_password)<1:
+			print "[*] Please fill in 'facebook_access_token', 'facebook_username' and 'facebook_password' before continuing."
+			sys.exit()
   		options(sys.argv)
  
