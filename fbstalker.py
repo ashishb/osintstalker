@@ -33,6 +33,7 @@ requests.adapters.DEFAULT_RETRIES = 10
 
 h = httplib2.Http(".cache")
 
+
 facebook_access_token=""
 facebook_username = ""
 facebook_password = ""
@@ -45,8 +46,6 @@ internetAccess = True
 all_cookies = {}
 reportFileName = ""
 
-conn = sqlite3.connect('facebook.db')
-
 #For consonlidating all likes across Photos Likes+Post Likes
 peopleIDList = []
 likesCountList = []
@@ -58,6 +57,33 @@ chromeOptions = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images":2}
 chromeOptions.add_experimental_option("prefs",prefs)
 driver = webdriver.Chrome(chrome_options=chromeOptions)
+
+
+
+def createDatabase():
+	conn = sqlite3.connect('facebook.db')
+	c = conn.cursor()
+	sql = 'create table if not exists photosLiked (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
+	sql1 = 'create table if not exists photosCommented (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
+	sql2 = 'create table if not exists friends (sourceUID TEXT, name TEXT, userName TEXT unique, month TEXT, year TEXT)'
+	sql3 = 'create table if not exists friendsDetails (sourceUID TEXT, userName TEXT unique, userEduWork TEXT, userLivingCity TEXT, userCurrentCity TEXT, userLiveEvents TEXT, userGender TEXT, userStatus TEXT, userGroups TEXT)'
+	sql4 = 'create table if not exists videosBy (sourceUID TEXT, title TEXT unique, url TEXT)'
+	sql5 = 'create table if not exists pagesLiked (sourceUID TEXT, name TEXT unique, category TEXT,url TEXT)'
+	sql6 = 'create table if not exists photosOf (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
+	sql7 = 'create table if not exists photosBy (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
+    
+	c.execute(sql)
+    	c.execute(sql1)
+    	c.execute(sql2)
+    	c.execute(sql3)
+    	c.execute(sql4)
+    	c.execute(sql5)
+    	c.execute(sql6)
+    	c.execute(sql7)
+    	conn.commit()
+
+createDatabase()
+conn = sqlite3.connect('facebook.db')
 
 def createMaltego(username):
 	g = Graph()
@@ -113,28 +139,6 @@ def createMaltego(username):
 		print 'Closing'
 		zf.close()
  
-def createDatabase():
-	c = conn.cursor()
-	sql = 'create table if not exists photosLiked (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
-	sql1 = 'create table if not exists photosCommented (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
-	sql2 = 'create table if not exists friends (sourceUID TEXT, name TEXT, userName TEXT unique, month TEXT, year TEXT)'
-	sql3 = 'create table if not exists friendsDetails (sourceUID TEXT, userName TEXT unique, userEduWork TEXT, userLivingCity TEXT, userCurrentCity TEXT, userLiveEvents TEXT, userGender TEXT, userStatus TEXT, userGroups TEXT)'
-	sql4 = 'create table if not exists videosBy (sourceUID TEXT, title TEXT unique, url TEXT)'
-	sql5 = 'create table if not exists pagesLiked (sourceUID TEXT, name TEXT unique, category TEXT,url TEXT)'
-	sql6 = 'create table if not exists photosOf (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
-	sql7 = 'create table if not exists photosBy (sourceUID TEXT, description TEXT, photoURL TEXT unique, pageURL TEXT, username TEXT)'
-    
-	c.execute(sql)
-    	c.execute(sql1)
-    	c.execute(sql2)
-    	c.execute(sql3)
-    	c.execute(sql4)
-    	c.execute(sql5)
-    	c.execute(sql6)
-    	c.execute(sql7)
-    	conn.commit()
-
-
 def createLink(label):
 	xmlString = '<mtg:MaltegoLink xmlns:mtg="http://maltego.paterva.com/xml/mtgx" type="maltego.link.manual-link">'
 	xmlString += '<mtg:Properties>'
@@ -1716,10 +1720,6 @@ def analyzeFriends(userid):
 
 	
 def mainProcess(username):
-    	createDatabase()
-	#username = 'joey.zhi'  
-	#username = 'terence.q.wei'
-	#username = 'aree.nongni'
 	username = username.strip()
 	print "[*] Username:\t"+str(username)
 	global uid
