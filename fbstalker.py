@@ -290,11 +290,15 @@ def convertUser2ID(username):
 	resp, content = h.request(url, "GET")
 	if resp.status==200:
 		results = json.loads(content)
-		if len(str(results['data']))>0:
+		if len(results['data'])>0:
 			return results['data'][0]['uid']
 		else:
+			print "[!] Can't convert username 2 uid. Please check username"
+			sys.exit()
 			return 0
 	else:
+		print "[!] Please check your facebook_access_token before continuing"
+		sys.exit()
 		return 0
 
 def convertID2User(uid):
